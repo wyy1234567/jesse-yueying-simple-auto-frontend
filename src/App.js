@@ -14,7 +14,11 @@ class App extends Component {
       new_auto_vin: '',
       new_auto_make: '',
       new_auto_year: '',
-      new_auto_model: ''
+      new_auto_model: '',
+      update_price: '',
+      update_preowned: '',
+      update_vin: ''
+
     };
 
     this.getAll = this.getAll.bind(this);
@@ -58,13 +62,16 @@ class App extends Component {
 
   // Change the state show_update_form to true: price and preowned
   // Render the autoUpdate form 
-  handleUpdateButton = () => {
-
+  handleUpdateButton = (event) => {
+    this.setState({
+      show_update_form: true,
+      update_vin: event.target.value
+    });
   }
 
   // Delete the specific auto from the auto list
   // Make a delete request to the backend 
-  handleDeleteButton = (event, ) => {
+  handleDeleteButton = (event) => {
     axios.delete(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${event.target.value}`)
     .then(res => {
       if (res.status === 202) {
@@ -76,8 +83,33 @@ class App extends Component {
   // Return a simple form, handle the update event: only update its price and preowned
   // Update the auto list below, and make a patch to backend 
   // Hide the form once the operation is done: set the show_update_form to false 
-  renderAutoUpdateForm = () => {
+  // renderAutoUpdateForm = (vinNumber) => {
+  //   return (
+  //   <form onSubmit={() => this.handleUpdateAuto(vinNumber)}>
+  //     <input className="input" name="update_price" placeholder="Auto price" value={this.state.update_price} onChange={this.handleInputChange}/>
+  //     <input className="input" name="update_preowned" placeholder="Auto preowned" value={this.state.update_preowned} onChange={this.handleInputChange} />
+  //     <button>update</button>
+  //   </form>
+  //   )
+  // }
 
+  handleUpdateAuto = (event) => {
+    event.preventDefault();
+    let updated = {
+      price: this.state.update_price,
+      preowned: this.state.update_preowned
+    }
+
+    axios.patch(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${this.state.update_vin}`, updated)
+    .then(res => {
+      this.getAll()
+      this.setState({
+        update_price: '',
+        update_preowned: '',
+        update_vin:  '',
+        show_update_form: false
+      })
+    })
   }
 
   // Grab the form's info, update the auto list below 
@@ -169,6 +201,15 @@ class App extends Component {
           <button>search</button>
         </form>
 
+        {this.state.show_update_form ?
+              <form onSubmit={this.handleUpdateAuto}>
+              <input className="input" name="update_price" placeholder="Auto price" value={this.state.update_price} onChange={this.handleInputChange}/>
+              <input className="input" name="update_preowned" placeholder="Auto preowned" value={this.state.update_preowned} onChange={this.handleInputChange} />
+              <button>update</button>
+            </form>
+          
+        : ""}
+        
         <h1>All autos:</h1>
           <div className="Auto-list">
             {this.state.data.map((item, index) => (
