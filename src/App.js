@@ -16,7 +16,7 @@ class App extends Component {
       new_auto_year: '',
       new_auto_model: '',
       update_price: '',
-      update_preowned: '',
+      update_preowned: 'YES',
       update_vin: ''
 
     };
@@ -26,14 +26,12 @@ class App extends Component {
 
   componentDidMount() {
     this.getAll();
-    console.log(this.state);
   }
 
   getAll() {
     axios
       .get('https://simple-autos-jesse-kiwi.herokuapp.com/autos')
       .then((res) => {
-        // console.log(res);
         var data = res.data.automobiles;
         this.setState({
           data: data,
@@ -53,6 +51,7 @@ class App extends Component {
           {auto.year ? " Year: " + auto.year + ", ": "" }
           {auto.year ? "Miles: " + auto.miles + ", ": "" }
           {auto.year ? "Price: " + auto.price + ", ": "" }
+          {auto.preowned ? "Pre-owned: " + auto.preowned + ", ": "" }
           <button className="update-auto-button" value={auto.vin} onClick={this.handleUpdateButton}>update</button>
           <button className="delete-auto-button" value={auto.vin} onClick={this.handleDeleteButton}>delete</button>
         </p>
@@ -60,8 +59,6 @@ class App extends Component {
     )
   }
 
-  // Change the state show_update_form to true: price and preowned
-  // Render the autoUpdate form 
   handleUpdateButton = (event) => {
     this.setState({
       show_update_form: true,
@@ -69,8 +66,6 @@ class App extends Component {
     });
   }
 
-  // Delete the specific auto from the auto list
-  // Make a delete request to the backend 
   handleDeleteButton = (event) => {
     axios.delete(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${event.target.value}`)
     .then(res => {
@@ -79,19 +74,6 @@ class App extends Component {
       }
     })
   }
-
-  // Return a simple form, handle the update event: only update its price and preowned
-  // Update the auto list below, and make a patch to backend 
-  // Hide the form once the operation is done: set the show_update_form to false 
-  // renderAutoUpdateForm = (vinNumber) => {
-  //   return (
-  //   <form onSubmit={() => this.handleUpdateAuto(vinNumber)}>
-  //     <input className="input" name="update_price" placeholder="Auto price" value={this.state.update_price} onChange={this.handleInputChange}/>
-  //     <input className="input" name="update_preowned" placeholder="Auto preowned" value={this.state.update_preowned} onChange={this.handleInputChange} />
-  //     <button>update</button>
-  //   </form>
-  //   )
-  // }
 
   handleUpdateAuto = (event) => {
     event.preventDefault();
@@ -112,38 +94,33 @@ class App extends Component {
     })
   }
 
-  // Grab the form's info, update the auto list below 
-  // Make a Post to backend, update the db
-  // Clear the form, don't refresh the page 
   handleNewAutoSubmit = (event) => {
     event.preventDefault();
-    let newAuto = {
-      vin: this.state.new_auto_vin, 
-      make: this.state.new_auto_make,
-      model: this.state.new_auto_model,
-      year: this.state.new_auto_year
-    }
-    axios.post('https://simple-autos-jesse-kiwi.herokuapp.com/autos', newAuto)
-      .then((res) => {
-      console.log(res);  
-
-      const copy = [...this.state.data]
-      copy.push(res.data)
-      this.setState({
-        data: copy,
-        new_auto_vin: '',
-        new_auto_make: '',
-        new_auto_year: '',
-        new_auto_model: ''
+    if (this.state.new_auto_vin !== "" && this.state.new_auto_make !== "" && this.state.new_auto_model !== "" && this.state.new_auto_year !== "") {
+      let newAuto = {
+        vin: this.state.new_auto_vin, 
+        make: this.state.new_auto_make,
+        model: this.state.new_auto_model,
+        year: this.state.new_auto_year
+      }
+      axios.post('https://simple-autos-jesse-kiwi.herokuapp.com/autos', newAuto)
+        .then((res) => {
+  
+        const copy = [...this.state.data]
+        copy.push(res.data)
+        this.setState({
+          data: copy,
+          new_auto_vin: '',
+          new_auto_make: '',
+          new_auto_year: '',
+          new_auto_model: ''
+        })
       })
-    })
-    .catch(function (err) {
-    });
+      .catch(function (err) {
+      });
+    }
   }
-
-
-  // Grab the form's info, filter the auto list, update the auto list with search result: make
-  // Clear the form, don't refresh the page 
+ 
   handleAutoSearch = (event) => {
     event.preventDefault();
 
@@ -152,7 +129,6 @@ class App extends Component {
     } else {
       axios.get(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${this.state.search_vin}`)
       .then(res => {
-        // console.log(res);
         this.setState({
           data: [res.data],
           search_vin: ""
@@ -165,7 +141,6 @@ class App extends Component {
   handleInputChange = (event) => {
     this.setState({ [event.target.name]: event.target.value }, () => {
       if (this.state.search_make === '') {
-        console.log("I WAS RAN");
         this.getAll();
       } else {
         if (event.target.name === 'search_make') {
@@ -174,7 +149,6 @@ class App extends Component {
             this.setState({
               data: res.data.automobiles
             }, () => {
-              console.log(res);
             })
           })
           .catch(function (err) {
@@ -204,13 +178,17 @@ class App extends Component {
         {this.state.show_update_form ?
               <form onSubmit={this.handleUpdateAuto}>
               <input className="input" name="update_price" placeholder="Auto price" value={this.state.update_price} onChange={this.handleInputChange}/>
-              <input className="input" name="update_preowned" placeholder="Auto preowned" value={this.state.update_preowned} onChange={this.handleInputChange} />
+              <select name="update_preowned" value={this.state.update_preowned} onChange={this.handleInputChange}>
+                <option value="YES">YES</option>
+                <option value="NO">NO</option>
+                <option value="CPO">CPO</option>
+              </select>
               <button>update</button>
             </form>
           
         : ""}
-        
-        <h1>All autos:</h1>
+
+        <h1>Autos:</h1>
           <div className="Auto-list">
             {this.state.data.map((item, index) => (
               this.renderAuto(item, index)
