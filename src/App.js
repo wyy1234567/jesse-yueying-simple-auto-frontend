@@ -58,10 +58,13 @@ class App extends Component {
           {auto.year ? auto.year: "" }
         </td>
         <td>
-          {auto.year ? auto.miles: "" }
+          {auto.miles ? auto.miles: "" }
         </td>
         <td>
-          {auto.year ? auto.price: "" }
+          {auto.price ? auto.price: "" }
+        </td>
+        <td>
+          {auto.preowned ? auto.preowned: "" }
         </td>
         <td>
           <button className="update-auto-button" value={auto.vin} onClick={this.handleUpdateButton}>update</button>
@@ -208,6 +211,7 @@ class App extends Component {
             <th>Year</th>
             <th>Miles</th>
             <th>Price</th>
+            <th>Preowned</th>
             <th>Update/Delete</th>
           </thead>
           <tbody>
