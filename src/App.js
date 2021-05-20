@@ -111,9 +111,18 @@ class App extends Component {
   }
 
   handleInputChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value}, () => {
-      console.log(this.state);
-    });
+    this.setState({ [event.target.name]: event.target.value });
+    if (event.target.name === 'search_make') {
+      axios.get(`https://simple-autos-jesse-kiwi.herokuapp.com/autos?color=&make=${this.state.search_make}`)
+      .then((res) => {
+        console.log(res);
+      //   this.setState({
+      //     data: res.data
+      //   })
+      })
+      .catch(function (err) {
+      });
+    }
   }
 
   render() {
@@ -127,9 +136,7 @@ class App extends Component {
           <button>submit</button>
         </form>
 
-        <form className="search-auto-form" onSubmit={this.handleAutoSearch()}>
-          <button>search</button>
-        </form>
+        <input className="input" name="search_make" placeholder="Search by make" value={this.state.search_make} onChange={this.handleInputChange} />
 
         <h1>All autos:</h1>
           <div className="Auto-list">
