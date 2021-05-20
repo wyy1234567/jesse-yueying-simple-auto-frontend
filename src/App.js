@@ -9,6 +9,7 @@ class App extends Component {
     this.state = {
       data: [],
       search_make: '',
+      search_vin: '',
       show_update_form: false,
       new_auto_vin: '',
       new_auto_make: '',
@@ -48,8 +49,8 @@ class App extends Component {
           {auto.year ? " Year: " + auto.year + ", ": "" }
           {auto.year ? "Miles: " + auto.miles + ", ": "" }
           {auto.year ? "Price: " + auto.price + ", ": "" }
-          <button className="update-auto-button" onClick={() => this.handleUpdateButton()}>update</button>
-          <button className="delete-auto-button" onClick={() => this.handleDeleteButton()}>delete</button>
+          <button className="update-auto-button" value={auto.vin} onClick={this.handleUpdateButton}>update</button>
+          <button className="delete-auto-button" value={auto.vin} onClick={this.handleDeleteButton}>delete</button>
         </p>
       </div>
     )
@@ -63,8 +64,13 @@ class App extends Component {
 
   // Delete the specific auto from the auto list
   // Make a delete request to the backend 
-  handleDeleteButton = () => {
-
+  handleDeleteButton = (event, ) => {
+    axios.delete(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${event.target.value}`)
+    .then(res => {
+      if (res.status === 202) {
+        this.getAll()
+      }
+    })
   }
 
   // Return a simple form, handle the update event: only update its price and preowned
@@ -106,23 +112,44 @@ class App extends Component {
 
   // Grab the form's info, filter the auto list, update the auto list with search result: make
   // Clear the form, don't refresh the page 
-  handleAutoSearch = () => {
+  handleAutoSearch = (event) => {
+    event.preventDefault();
 
+    if (this.state.search_vin === '') {
+      this.getAll();
+    } else {
+      axios.get(`https://simple-autos-jesse-kiwi.herokuapp.com/autos/${this.state.search_vin}`)
+      .then(res => {
+        // console.log(res);
+        this.setState({
+          data: [res.data],
+          search_vin: ""
+        })
+      })
+      .catch(function (err) {})
+    }
   }
 
   handleInputChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
-    if (event.target.name === 'search_make') {
-      axios.get(`https://simple-autos-jesse-kiwi.herokuapp.com/autos?color=&make=${this.state.search_make}`)
-      .then((res) => {
-        console.log(res);
-      //   this.setState({
-      //     data: res.data
-      //   })
-      })
-      .catch(function (err) {
-      });
-    }
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      if (this.state.search_make === '') {
+        console.log("I WAS RAN");
+        this.getAll();
+      } else {
+        if (event.target.name === 'search_make') {
+          axios.get(`https://simple-autos-jesse-kiwi.herokuapp.com/autos?make=${this.state.search_make}`)
+          .then((res) => {
+            this.setState({
+              data: res.data.automobiles
+            }, () => {
+              console.log(res);
+            })
+          })
+          .catch(function (err) {
+          });
+        }
+      }
+    });
   }
 
   render() {
@@ -137,6 +164,10 @@ class App extends Component {
         </form>
 
         <input className="input" name="search_make" placeholder="Search by make" value={this.state.search_make} onChange={this.handleInputChange} />
+        <form onSubmit={this.handleAutoSearch}>
+          <input className="input" name="search_vin" placeholder="Search by vin" value={this.state.search_vin} onChange={this.handleInputChange} />
+          <button>search</button>
+        </form>
 
         <h1>All autos:</h1>
           <div className="Auto-list">
