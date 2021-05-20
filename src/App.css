@@ -7,12 +7,6 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -28,11 +22,34 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Auto-list{
+  border-collapse: collapse;
+  margin: auto;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.Auto-list thead th {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.Auto-list th,
+.Auto-list td {
+    padding: 12px 15px;
+}
+
+.Auto-list tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.Auto-list tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.Auto-list tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
 }
