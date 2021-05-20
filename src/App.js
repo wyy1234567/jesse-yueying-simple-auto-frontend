@@ -26,6 +26,7 @@ class App extends Component {
 
   componentDidMount() {
     this.getAll();
+    console.log(this.state);
   }
 
   getAll() {
@@ -45,9 +46,9 @@ class App extends Component {
     return(
       <div className="Auto-details" key={index}>
         <p> 
-          Model: {auto.model}, 
-          Vin: {auto.vin}, 
-          Make: {auto.make}, 
+          <b>Model:</b> {auto.model}, 
+          <b> Vin:</b> {auto.vin}, 
+          <b> Make:</b> {auto.make}, 
           {auto.year ? " Year: " + auto.year + ", ": "" }
           {auto.year ? "Miles: " + auto.miles + ", ": "" }
           {auto.year ? "Price: " + auto.price + ", ": "" }
